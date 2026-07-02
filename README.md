@@ -2,6 +2,15 @@
 
 Six standalone Java 21 POCs — one focused engine each, no Spring, no Maven. Each POC is a single `.java` file you can compile and run directly. They demonstrate the core hard-part of each scenario rather than the surrounding plumbing.
 
+## Documentation
+
+| Doc | What's in it |
+|-----|--------------|
+| [ISSUE.md](ISSUE.md) | Why these POCs exist, the core problem they de-risk, and the definition of done for the POC phase. |
+| [TECHNICAL.md](TECHNICAL.md) | Per-POC deep dive: the hard problem, what we protect, solution shape, key tech by responsibility, and tech debt. |
+| [CONSISTENCY.md](CONSISTENCY.md) | How to scale these single-JVM engines across K8s pods / VMs without breaking their single-writer correctness. |
+| [explainer.html](explainer.html) | Interactive visual walkthrough — open it in a browser to explore each engine's flow and key technique. |
+
 ## Requirements
 
 - **JDK 21+** (your machine currently has JDK 11 — please install JDK 21).

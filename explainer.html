@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading POCs — Visual Explainer</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2330; --line:#30363d;
+    --txt:#e6edf3; --muted:#8b949e; --accent:#58a6ff; --green:#3fb950;
+    --red:#f85149; --amber:#d29922; --purple:#bc8cff; --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;line-height:1.55}
+  header{padding:38px 24px 26px;text-align:center;border-bottom:1px solid var(--line);
+         background:radial-gradient(1200px 300px at 50% -40%,rgba(88,166,255,.15),transparent)}
+  header h1{margin:0 0 6px;font-size:30px;letter-spacing:-.5px}
+  header p{margin:0;color:var(--muted);font-size:15px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  nav{position:sticky;top:0;z-index:10;background:rgba(13,17,23,.92);backdrop-filter:blur(8px);
+      border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:10px 12px}
+  nav button{background:var(--panel);border:1px solid var(--line);color:var(--muted);
+             padding:8px 13px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:.15s}
+  nav button:hover{color:var(--txt);border-color:var(--accent)}
+  nav button.active{background:var(--accent);color:#04101f;border-color:var(--accent)}
+  section{display:none;padding:30px 0 60px;animation:fade .3s ease}
+  section.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  h2{font-size:24px;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+  h2 .tag{font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;background:var(--panel2);color:var(--accent);border:1px solid var(--line)}
+  .lead{color:var(--muted);margin:0 0 22px;font-size:15px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:18px 0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+  .card h3{margin:0 0 8px;font-size:14px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+  .card.hard{border-left:3px solid var(--red)}
+  .card.protect{border-left:3px solid var(--green)}
+  .card.tech{border-left:3px solid var(--accent)}
+  .card.debt{border-left:3px solid var(--amber)}
+  .card p,.card li{font-size:14px;margin:6px 0}
+  ul{padding-left:18px;margin:6px 0}
+  code{font-family:var(--mono);background:var(--panel2);padding:1px 5px;border-radius:4px;font-size:12.5px;color:var(--purple)}
+  pre{background:#010409;border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow:auto;
+      font-family:var(--mono);font-size:12.5px;color:#c9d1d9;line-height:1.5}
+  .kv{width:100%;border-collapse:collapse;margin:8px 0;font-size:13.5px}
+  .kv td{border:1px solid var(--line);padding:8px 10px;vertical-align:top}
+  .kv td:first-child{color:var(--accent);font-weight:600;white-space:nowrap;width:34%}
+  .overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+  .oc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;cursor:pointer;transition:.15s}
+  .oc:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .oc .num{font-family:var(--mono);color:var(--accent);font-size:12px}
+  .oc h3{margin:4px 0 8px;font-size:17px}
+  .oc p{margin:0;color:var(--muted);font-size:13.5px}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0;font-size:13px}
+  .flow .step{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+  .flow .arrow{color:var(--accent);font-weight:700}
+  .demo{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;margin:18px 0}
+  .demo h3{margin:0 0 12px;font-size:15px}
+  .btn{background:var(--accent);color:#04101f;border:none;padding:8px 14px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px}
+  .btn.sec{background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
+  .book{display:grid;grid-template-columns:1fr 1fr;gap:14px;font-family:var(--mono);font-size:12.5px}
+  .book .col{background:#010409;border:1px solid var(--line);border-radius:8px;padding:10px}
+  .lvl{display:flex;justify-content:space-between;padding:3px 6px;border-radius:4px;margin:2px 0}
+  .lvl.ask{color:var(--red)}.lvl.bid{color:var(--green)}
+  .lvl .bar{height:14px;border-radius:3px;opacity:.35}
+  .tape{font-family:var(--mono);font-size:12px;background:#010409;border:1px solid var(--line);border-radius:8px;
+        padding:10px;height:120px;overflow:auto;margin-top:10px}
+  .price-track{position:relative;height:90px;background:#010409;border:1px solid var(--line);border-radius:8px;margin:12px 0;overflow:hidden}
+  .trigger-line{position:absolute;left:0;right:0;border-top:2px dashed var(--red);}
+  .trigger-line span{position:absolute;right:6px;top:-9px;font-size:11px;background:var(--bg);padding:0 4px;color:var(--red)}
+  .dot{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--accent);transform:translate(-50%,-50%);transition:.4s}
+  .note{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:20px;margin-left:6px}
+  .pill.a{background:rgba(88,166,255,.15);color:var(--accent)}
+  .pill.b{background:rgba(210,153,34,.15);color:var(--amber)}
+  .pill.c{background:rgba(188,140,255,.15);color:var(--purple)}
+  footer{border-top:1px solid var(--line);padding:24px;text-align:center;color:var(--muted);font-size:13px}
+  .fired{color:var(--red);font-weight:700}
+  .ok{color:var(--green)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Trading / Brokerage POCs</h1>
+    <p>Six single-file Java 21 engines — the hard algorithmic core of a brokerage, de-risked before framework work begins.</p>
+  </div>
+</header>
+
+<nav id="nav">
+  <button data-t="home" class="active">Overview</button>
+  <button data-t="p11">11 · Matching</button>
+  <button data-t="p12">12 · P&amp;L</button>
+  <button data-t="p13">13 · Stop-Loss</button>
+  <button data-t="p14">14 · Margin</button>
+  <button data-t="p15">15 · Settlement</button>
+  <button data-t="p16">16 · Corp Actions</button>
+  <button data-t="scale">Scaling</button>
+</nav>
+
+<div class="wrap">
+
+<!-- ================= HOME ================= -->
+<section id="home" class="active">
+  <h2>What is this?</h2>
+  <p class="lead">Each POC attacks the <b>one thing that is genuinely hard</b> in a brokerage subsystem — the part
+  that is correct 99% of the time and catastrophically wrong in the 1% edge case, invisible until real money moves.
+  Click a card to jump to its walkthrough.</p>
+  <div class="overview">
+    <div class="oc" data-go="p11"><div class="num">POC 11</div><h3>Order Matching ⚖️</h3><p>Price-time priority, partial fills, stop→market conversion. Deterministic, ~µs/order.</p></div>
+    <div class="oc" data-go="p12"><div class="num">POC 12</div><h3>Real-time P&amp;L 📈</h3><p>Recompute only the position that ticked; push only what changed. Single-writer pump.</p></div>
+    <div class="oc" data-go="p13"><div class="num">POC 13</div><h3>Stop-Loss Engine 🎯</h3><p>Gap-aware cross detection, trailing ratchet, OCO. Fires across price gaps, not on equality.</p></div>
+    <div class="oc" data-go="p14"><div class="num">POC 14</div><h3>Margin Engine 🛡️</h3><p>Pre-trade affordability, tick revaluation, call → grace → forced liquidation.</p></div>
+    <div class="oc" data-go="p15"><div class="num">POC 15</div><h3>Settlement (T+2) 🏦</h3><p>Settled vs available dual balances, rolling reuse, withdrawal hard-wall.</p></div>
+    <div class="oc" data-go="p16"><div class="num">POC 16</div><h3>Corporate Actions 🔀</h3><p>Splits/dividends/mergers at EOD with basis adjustment + pre/post snapshots.</p></div>
+  </div>
+
+  <h2 style="margin-top:34px">Cross-cutting decisions</h2>
+  <p class="lead">Opinions shared by all six, worth carrying into <code>daccount</code>.</p>
+  <table class="kv">
+    <tr><td>Money in <code>long</code> micros</td><td>Integer VND × 10⁶. No <code>double</code> drift, no <code>BigDecimal</code> allocation in hot paths. The only <code>double</code> is the margin <i>ratio</i> comparison.</td></tr>
+    <tr><td>Sealed interfaces + exhaustive <code>switch</code></td><td>A missing case is a compile error, not a production surprise. Used for events, decisions, corporate actions.</td></tr>
+    <tr><td>Single-writer per aggregate</td><td>No locks on the book/position. Deterministic. Same pattern as LMAX Disruptor / Akka.</td></tr>
+    <tr><td>Append-only event &amp; audit logs</td><td>Nothing mutated in place. Enables back-testing, reconciliation, regulatory replay — and doubles as the recovery log.</td></tr>
+    <tr><td>Snapshots wrap irreversible ops</td><td>Corporate actions keep before/after snapshots — the only way to investigate after the fact.</td></tr>
+  </table>
+</section>
+
+<!-- ================= P11 ================= -->
+<section id="p11">
+  <h2>Order Matching <span class="tag">OrderMatchingPoc.java</span></h2>
+  <p class="lead">Match incoming orders against a resting book with correct price-time priority and partial fills — deterministically.</p>
+  <div class="grid">
+    <div class="card hard"><h3>The hard problem</h3><p>Correct <b>price-time priority</b> + partial fills, while a stop can convert to a market order <i>mid-match</i> and re-enter the same book. Wrong ordering = you fill the wrong customer first.</p></div>
+    <div class="card protect"><h3>What we protect</h3><ul><li>Best price first; within a price, first-arrived first</li><li>Resting order's price wins (aggressor improvement)</li><li>Atomic: both sides + event log in one step</li><li>Determinism for replay &amp; test</li></ul></div>
+  </div>
+  <h3>Data structure</h3>
+  <pre>bids: TreeMap&lt;price&#8595;, ArrayDeque&lt;Order&gt;&gt;   // best bid first, FIFO within level
+asks: TreeMap&lt;price&#8593;, ArrayDeque&lt;Order&gt;&gt;   // best ask first, FIFO within level
+stopBook: List&lt;Order&gt;                      // checked after every trade</pre>
+  <div class="flow">
+    <span class="step">incoming order</span><span class="arrow">→</span>
+    <span class="step">cross() vs opposite book</span><span class="arrow">→</span>
+    <span class="step">rest the remainder</span><span class="arrow">→</span>
+    <span class="step">checkStops()</span>
+  </div>
+
+  <div class="demo">
+    <h3>Live order book — send an aggressive order</h3>
+    <div class="book">
+      <div class="col"><b style="color:var(--red)">ASKS</b><div id="asks"></div></div>
+      <div class="col"><b style="color:var(--green)">BIDS</b><div id="bids"></div></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" onclick="mm('buy')">Buy 150 @ 80,500 (marketable limit)</button>
+      <button class="btn sec" onclick="mm('reset')">Reset book</button>
+    </div>
+    <div class="tape" id="tape"></div>
+    <div class="note">Watch the aggressive buy walk the ask side FIFO, take price improvement, and leave a partial fill resting.</div>
+  </div>
+  <div class="card debt"><h3>Tech debt</h3><ul><li>Market remainder = IOC only (no FOK/GTC/post-only)</li><li><code>checkStops()</code> is O(n) per trade — prod wants POC 13's TreeMap index</li><li>Single symbol/thread; no self-trade prevention, fees, or tick/lot validation</li></ul></div>
+</section>
+
+<!-- ================= P12 ================= -->
+<section id="p12">
+  <h2>Real-time P&amp;L <span class="tag">RealtimePnlPoc.java</span></h2>
+  <p class="lead">Value a live portfolio under tens of thousands of ticks/sec without recomputing everything.</p>
+  <div class="grid">
+    <div class="card hard"><h3>The hard problem</h3><p>Naïve engine recomputes the whole portfolio on every tick — O(positions) — and pushes it all to the client. <b>Recompute only what ticked; push only what changed.</b></p></div>
+    <div class="card protect"><h3>What we protect</h3><ul><li>FIFO lots for realized P&amp;L</li><li>O(1) unrealized via incremental weighted-avg</li><li>Exactly one writer per position — no lost ticks</li><li>Client sees deltas, not snapshots</li></ul></div>
+  </div>
+  <h3>Two costing methods, one position</h3>
+  <table class="kv">
+    <tr><td>Realized (on sell)</td><td><b>FIFO</b> over <code>ArrayDeque&lt;Lot&gt;</code> — pop oldest lots; you must know <i>which</i> lot you sold.</td></tr>
+    <tr><td>Unrealized (on tick)</td><td><b>O(1)</b> = <code>qty × (last − avgCost)</code> using the incrementally maintained weighted average — no scan of lots per tick.</td></tr>
+  </table>
+  <div class="flow">
+    <span class="step">30k ticks</span><span class="arrow">→</span>
+    <span class="step">single mailbox (ArrayBlockingQueue)</span><span class="arrow">→</span>
+    <span class="step">virtual-thread pump</span><span class="arrow">→</span>
+    <span class="step">route to the 1 position that ticked</span><span class="arrow">→</span>
+    <span class="step">delta ≠ 0 ? push</span>
+  </div>
+  <pre>// only publish when the delta is non-zero — saves bandwidth on tiny ticks
+if (next != prev) { sink.accept(pos); deltasPublished.incrementAndGet(); }</pre>
+  <div class="card debt"><h3>Tech debt</h3><ul><li>Incremental avg accumulates rounding — prod reconciles vs periodic full recompute</li><li>Mailbox drop-on-full loses ticks silently — needs seq numbers + gap detection</li><li>No corporate-action hook — a split mid-session corrupts basis until POC 16 wired in</li></ul></div>
+</section>
+
+<!-- ================= P13 ================= -->
+<section id="p13">
+  <h2>Stop-Loss Engine <span class="tag">StopLossEnginePoc.java</span></h2>
+  <p class="lead">Fire triggers on a <b>price cross over an interval</b> — not on equality with the latest tick.</p>
+  <div class="grid">
+    <div class="card hard"><h3>The hard problem: GAPS</h3><p>Price can jump straight <i>through</i> a trigger between two ticks (overnight gap, lunch reopen). Fire on <code>price == trigger</code> and you silently miss the gap — the exact case the stop exists for.</p></div>
+    <div class="card protect"><h3>What we protect</h3><ul><li>Downside protection works across gaps</li><li>Trailing stops ratchet, never give ground</li><li>OCO: one leg fires → the other is cancelled once</li></ul></div>
+  </div>
+  <h3>The core trick — range query, not equality</h3>
+  <pre>// Instead of "is the trigger == the new tick?", ask the TreeMap for EVERY
+// trigger whose price lies in the band the price just moved through:
+view = fallsTo.subMap(now, true, last, false);   // (now .. last]  — O(log n + k)</pre>
+  <div class="demo">
+    <h3>Gap-down demo — a stop at 120,000</h3>
+    <div class="price-track" id="track">
+      <div class="trigger-line" style="top:33%"><span>stop 120,000</span></div>
+      <div class="dot" id="pdot" style="left:15%;top:10%"></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn sec" onclick="gap('smooth')">Smooth tick to 119k (equality would catch)</button>
+      <button class="btn" onclick="gap('jump')">GAP 122k → 115k (only range query catches)</button>
+      <button class="btn sec" onclick="gap('reset')">Reset</button>
+    </div>
+    <div id="gapmsg" class="note">Price at 122,000. A naïve engine only fires if a tick lands exactly at 120,000.</div>
+  </div>
+  <div class="card tech"><h3>Trailing &amp; OCO</h3><ul><li><b>Trailing:</b> on a favorable tick advance <code>extremePrice</code>, recompute <code>extreme − trail</code>; if higher, <i>move the key</i> in the TreeMap. Unfavorable ticks leave it put — the ratchet.</li><li><b>OCO:</b> each leg holds the other's id; firing one deactivates &amp; removes the other.</li></ul></div>
+  <div class="card debt"><h3>Tech debt</h3><ul><li>Restart loses resting triggers — must reload store <b>and re-establish <code>lastPrice</code></b> before arming, or cold start mis-fires</li><li>Fires don't route to execution — that's POC 11</li><li>No halt/auction-reopen semantics</li></ul></div>
+</section>
+
+<!-- ================= P14 ================= -->
+<section id="p14">
+  <h2>Margin Engine <span class="tag">MarginEnginePoc.java</span></h2>
+  <p class="lead">Pre-trade affordability + intraday revaluation + the full margin-call lifecycle.</p>
+  <div class="grid">
+    <div class="card hard"><h3>The hard problem</h3><p>The pre-trade check must decide <i>before</i> execution whether the account affords initial margin <b>and</b> won't immediately breach maintenance margin on the resulting mix — then the tick loop must run call → grace → cure/liquidate.</p></div>
+    <div class="card protect"><h3>What we protect</h3><ul><li>Broker capital: risk never exceeds equity</li><li>Fair liquidation: weakest first, only as much as needed</li><li>Deterministic money math</li></ul></div>
+  </div>
+  <pre>equity = cash + &Sigma;(qty × last) − marginLoan
+ratio  = equity / positionValue          // margin call when ratio &lt; weightedMM</pre>
+  <div class="flow">
+    <span class="step">tick</span><span class="arrow">→</span>
+    <span class="step">reprice positions</span><span class="arrow">→</span>
+    <span class="step">evaluateMargin</span><span class="arrow">→</span>
+    <span class="step" style="color:var(--muted)">NONE</span><span class="arrow">→</span>
+    <span class="step" style="color:var(--amber)">ISSUED</span><span class="arrow">→</span>
+    <span class="step ok">CURED</span> <span style="color:var(--muted)">or</span> <span class="step fired">LIQUIDATED</span>
+  </div>
+  <table class="kv">
+    <tr><td>Pre-trade catch</td><td>Projects the maintenance ratio <i>including</i> the prospective lot (<code>weightedMMProjected</code>) — rejects the "affordable now, margin-called instantly" trap.</td></tr>
+    <tr><td>Lifecycle guard</td><td><code>enum CallState</code> state machine makes double-issue / liquidate-a-cured-account impossible.</td></tr>
+    <tr><td>Liquidate weakest</td><td>Sort by loss %, sell worst-first, re-check ratio after each sale, stop at MM × 1.10 buffer.</td></tr>
+  </table>
+  <div class="card debt"><h3>Tech debt</h3><ul><li>Ratio math uses <code>double</code> (the one deliberate one) — prod needs a tolerance band to stop flapping at <code>ratio ≈ MM</code></li><li>Liquidation is one-shot at last price — no child-order schedule/slippage</li><li>No cross-margin/netting; no derivatives Greeks</li></ul></div>
+</section>
+
+<!-- ================= P15 ================= -->
+<section id="p15">
+  <h2>Settlement (T+2) <span class="tag">SettlementPoc.java</span></h2>
+  <p class="lead">Cash lives in two states at once: settled (withdrawable) and pending (reusable, not withdrawable).</p>
+  <div class="grid">
+    <div class="card hard"><h3>The hard problem</h3><p>Get the two-balance accounting wrong and you either block legitimate buys or — worse — let a customer withdraw money the depository hasn't delivered.</p></div>
+    <div class="card protect"><h3>What we protect</h3><ul><li><b>Hard wall:</b> only settled cash can leave</li><li>Rolling reuse: pending proceeds fund buys same-day</li><li>Append-only audit of every booking/settle/fail</li></ul></div>
+  </div>
+  <h3>The two formulas <i>are</i> the design</h3>
+  <pre>availableForBuy      = settled + pendingCredits − pendingDebits   // buys may spend pending
+availableForWithdraw = settled              − pendingDebits        // withdrawals may NOT</pre>
+  <div class="flow">
+    <span class="step">T+0 sell booked</span><span class="arrow">→</span>
+    <span class="step">CREDIT into T+2 bucket (pending)</span><span class="arrow">→</span>
+    <span class="step">same-day buy reuses it</span><span class="arrow">→</span>
+    <span class="step">T+2 day-tick sweep</span><span class="arrow">→</span>
+    <span class="step ok">net into settled</span>
+  </div>
+  <p class="note">A failed delivery marks the bucket <span class="fired">FAILED</span>; the sweep skips it and settled cash is never credited. The <code>Status</code> field is exactly the idempotency guard the distributed version needs (see Scaling).</p>
+  <div class="card debt"><h3>Tech debt</h3><ul><li>Naïve weekend skip — needs a real holiday calendar</li><li><code>Instant.now()</code> makes replay non-deterministic — inject a clock</li><li>No FX, partial settlement, or counterparty netting; failed-<i>buy</i> unwind undefined</li></ul></div>
+</section>
+
+<!-- ================= P16 ================= -->
+<section id="p16">
+  <h2>Corporate Actions <span class="tag">CorporateActionsPoc.java</span></h2>
+  <p class="lead">Splits, dividends, mergers — applied at EOD with basis adjustment and a pre/post snapshot trail.</p>
+  <div class="grid">
+    <div class="card hard"><h3>The hard problem</h3><p>These rewrite positions <b>+ cost basis + open orders</b> at once. Silent bug factories: a wrong split ratio makes all downstream P&amp;L fictional and is unrecoverable <i>after the fact</i> without a snapshot.</p></div>
+    <div class="card protect"><h3>What we protect</h3><ul><li>Basis integrity: 2:1 split halves basis with share count</li><li>Open orders adjust (₫160k limit → ₫80k)</li><li>Immutable before/after snapshot per action</li></ul></div>
+  </div>
+  <div class="flow">
+    <span class="step">announce → queue by effective date</span><span class="arrow">→</span>
+    <span class="step">runEod(today)</span><span class="arrow">→</span>
+    <span class="step">snapshot BEFORE</span><span class="arrow">→</span>
+    <span class="step">mutate (sealed switch)</span><span class="arrow">→</span>
+    <span class="step">snapshot AFTER</span><span class="arrow">→</span>
+    <span class="step ok">AdjustmentEvent logged</span>
+  </div>
+  <table class="kv">
+    <tr><td>2:1 Split</td><td>qty × 2, cost ÷ 2 — total value invariant. Open orders scaled the same way.</td></tr>
+    <tr><td>Cash dividend</td><td><code>cash += qty × perShare</code> (POC keeps it gross; WHT seam marked).</td></tr>
+    <tr><td>Stock dividend</td><td>Same total cost spread over more shares.</td></tr>
+    <tr><td>Merger</td><td>Basis (minus cash portion) carries into acquirer shares, combined by weighted avg; source orders cancelled.</td></tr>
+  </table>
+  <p class="note"><b>Exhaustiveness:</b> because <code>CorporateAction</code> is <code>sealed</code>, adding a new type (e.g. rights issue) is a <i>compile error</i> until every switch handles it.</p>
+  <div class="card debt"><h3>Tech debt</h3><ul><li>Withholding tax skipped (marked in-code)</li><li>Integer division leaves basis residue — needs fractional/cash-in-lieu handling</li><li>Snapshots are full in-heap deep copies — prod externalises to an event store</li><li>No reversal flow for amended action terms</li></ul></div>
+</section>
+
+<!-- ================= SCALING ================= -->
+<section id="scale">
+  <h2>Scaling across pods / VMs</h2>
+  <p class="lead">Every POC is single-JVM, single-writer. That's what makes them correct. The moment there are two replicas, that guarantee breaks — and you get <b>wrong money numbers</b>, not just lost performance.</p>
+  <div class="card hard" style="margin-bottom:18px"><h3>What breaks with naïve pod scaling</h3><p>Round-robin a keyed workload across N pods and: two P&amp;L pumps mutate "the" VNM position and diverge; a margin check races a revaluation on another pod; two pods both run the settlement sweep and double-credit a bucket.</p></div>
+  <p><b>The fix:</b> keep single-writer, but make it single-writer <i>per aggregate across the whole cluster</i>, not per process.</p>
+  <div class="grid">
+    <div class="card tech"><h3>A · Partition by key <span class="pill a">hot engines</span></h3><p>Kafka topic keyed by aggregate → all messages for a key hit one partition → one consumer = the single writer. Scale by <b>partition count</b>, not pod count.</p><p class="note">K8s: <code>StatefulSet</code> for stable identity, long <code>terminationGracePeriodSeconds</code>, <code>PodDisruptionBudget</code>. Rebuild in-memory state on handoff before processing.</p></div>
+    <div class="card tech" style="border-left-color:var(--amber)"><h3>B · Leader / run-once <span class="pill b">batch jobs</span></h3><p>Settlement sweep &amp; corp-action EOD must run <i>exactly once</i>. Use K8s <code>CronJob</code> + <code>concurrencyPolicy: Forbid</code>, or a Redis <code>SET NX</code> lock. <b>Idempotency still mandatory</b> — guard with a persisted compare-and-set status.</p></div>
+    <div class="card tech" style="border-left-color:var(--purple)"><h3>C · Optimistic concurrency <span class="pill c">no sticky routing</span></h3><p>DB is the source of truth; every write is <code>UPDATE … WHERE id=? AND version=?</code>. In-memory state is a cache. Good for the API-path margin check.</p></div>
+  </div>
+  <h3 style="margin-top:24px">State recovery — the part you can't skip</h3>
+  <p>Under partitioning a pod loses its partition at any time. The new owner must rebuild the exact in-heap state:</p>
+  <div class="flow">
+    <span class="step">load latest snapshot</span><span class="arrow">→</span>
+    <span class="step">replay events since snapshot offset</span><span class="arrow">→</span>
+    <span class="step ok">then start consuming live</span>
+  </div>
+  <p class="note">This is why "append-only everything" matters beyond audit — <b>the audit log is also the recovery log.</b></p>
+  <h3 style="margin-top:24px">Per-engine summary</h3>
+  <table class="kv">
+    <tr><td>11 matching</td><td><span class="pill a">A</span> partition by symbol — one book, one owner</td></tr>
+    <tr><td>12 P&amp;L</td><td><span class="pill a">A</span> partition by account/symbol — rebuild positions on handoff</td></tr>
+    <tr><td>13 stop-loss</td><td><span class="pill a">A</span> partition by symbol — rebuild triggers <b>and lastPrice</b> before arming</td></tr>
+    <tr><td>14 margin</td><td><span class="pill a">A</span> revaluation + <span class="pill c">C</span> API-path write guard</td></tr>
+    <tr><td>15 settlement</td><td><span class="pill b">B</span> CronJob+Forbid; idempotent bucket status CAS</td></tr>
+    <tr><td>16 corp actions</td><td><span class="pill b">B</span> CronJob+Forbid; snapshots externalised; idempotent by (symbol, date)</td></tr>
+  </table>
+  <div class="card debt" style="margin-top:18px"><h3>Not claiming</h3><p>These POCs are not cluster-ready as written — this is the design for making them so. No 2PC/distributed transactions: the pattern is <b>partition + idempotent event replay</b>, which the append-only design was chosen to enable. Full detail in <code>CONSISTENCY.md</code>.</p></div>
+</section>
+
+</div>
+
+<footer>Trading POCs · JDK 21 single-file engines · see ISSUE.md · TECHNICAL.md · CONSISTENCY.md</footer>
+
+<script>
+// ---- tab nav ----
+const nav=document.getElementById('nav');
+function show(id){
+  document.querySelectorAll('section').forEach(s=>s.classList.toggle('active',s.id===id));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.t===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+nav.addEventListener('click',e=>{if(e.target.dataset.t)show(e.target.dataset.t)});
+document.querySelectorAll('.oc').forEach(c=>c.addEventListener('click',()=>show(c.dataset.go)));
+
+// ---- POC 11 order book demo ----
+let asks,bids,tradeSeq;
+function seed(){
+  asks=[{px:81000,qty:100},{px:80500,qty:200},{px:80500,qty:150}];
+  bids=[{px:80000,qty:100},{px:79500,qty:250}];
+  tradeSeq=0; document.getElementById('tape').innerHTML='';
+  renderBook();
+}
+function agg(list){ // aggregate qty by price
+  const m={}; list.forEach(o=>m[o.px]=(m[o.px]||0)+o.qty); return m;
+}
+function renderBook(){
+  const aA=agg(asks), aB=agg(bids);
+  const max=Math.max(1,...Object.values(aA),...Object.values(aB));
+  const rows=(m,cls)=>Object.keys(m).sort((x,y)=>cls==='ask'?y-x:y-x)
+    .map(px=>`<div class="lvl ${cls}"><span>${(+px).toLocaleString()}</span>
+      <span style="flex:1;margin:0 8px"><span class="bar" style="display:inline-block;width:${m[px]/max*100}%;background:${cls==='ask'?'var(--red)':'var(--green)'}"></span></span>
+      <span>${m[px]}</span></div>`).join('');
+  document.getElementById('asks').innerHTML=rows(aA,'ask');
+  document.getElementById('bids').innerHTML=rows(aB,'bid');
+}
+function tape(s,cls=''){const t=document.getElementById('tape');t.innerHTML=`<div class="${cls}">${s}</div>`+t.innerHTML;}
+function mm(cmd){
+  if(cmd==='reset'){seed();tape('book reset');return;}
+  // aggressive buy 150 @ 80,500 — crosses lowest asks FIFO, price improvement (resting px)
+  let rem=150; tape('&gt; incoming BUY 150 @ 80,500','ok');
+  // sort asks by price asc, FIFO order preserved by array order at equal price
+  asks.sort((a,b)=>a.px-b.px);
+  while(rem>0 && asks.length && asks[0].px<=80500){
+    const r=asks[0]; const q=Math.min(rem,r.qty);
+    tape(`  TRADE qty=${q} @ ${r.px.toLocaleString()} (resting price wins)`);
+    rem-=q; r.qty-=q; if(r.qty===0) asks.shift();
+  }
+  if(rem>0){ bids.push({px:80500,qty:rem}); tape(`  rest ${rem} @ 80,500 on the bid side (partial fill)`);}
+  renderBook();
+}
+seed();
+
+// ---- POC 13 gap demo ----
+const track=document.getElementById('track'), dot=document.getElementById('pdot'), gmsg=document.getElementById('gapmsg');
+// map price 115000..123000 to top 90%..5%
+function ptop(px){const t=(123000-px)/(123000-115000);return 5+t*80;}
+function pleft(x){return x;}
+let gx=15;
+function place(px){dot.style.top=ptop(px)+'%';}
+function gap(mode){
+  if(mode==='reset'){gx=15;dot.style.left='15%';dot.style.background='var(--accent)';place(122000);
+    gmsg.innerHTML='Price at 122,000. A naïve engine only fires if a tick lands exactly at 120,000.';return;}
+  gx=Math.min(85,gx+22);dot.style.left=gx+'%';
+  if(mode==='smooth'){place(119000);
+    gmsg.innerHTML='Ticked to 119,000. Crossed 120,000 by 1 tick — <span class="ok">both approaches fire</span> here.';}
+  if(mode==='jump'){place(115000);dot.style.background='var(--red)';
+    gmsg.innerHTML='<span class="fired">GAP 122,000 → 115,000.</span> No tick landed at 120,000 — equality MISSES. '+
+      'The range query <code>fallsTo.subMap(115000, 122000)</code> returns the 120,000 stop and <span class="fired">fires it</span>.';}
+}
+place(122000);
+</script>
+</body>
+</html>
